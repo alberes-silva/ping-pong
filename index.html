@@ -15,16 +15,20 @@
               canvasCtx = canvasEl.getContext("2d");
               gapX = 10
 
-              const field = {
-                w: window.innerWidth,
-                h: window.innerHeight,
-                draw: function () {
-                     //Criando o campo
-                    canvasCtx.fillStyle = "#286047" //Define a cor (fillStyle - responsável pelo estilo)
-                    canvasCtx.fillRect(0, 0, this.w, this.h) //Define a posição inicial, Largura e Altura
+              const mouse = { x: 0, y: 0}
+
+        const field = {
+            w: window.innerWidth,
+            h: window.innerHeight,
+            draw: function () {
+         //Criando o campo
+            canvasCtx.fillStyle = "#286047" //Define a cor (fillStyle - responsável pelo estilo)
+            canvasCtx.fillRect(0, 0, this.w, this.h) //Define a posição inicial, Largura e Altura
                 },
               }
 
+
+        //Criando a linha de meio de campo
         const line = {
             w: 15,
             h: field.h,
@@ -40,24 +44,34 @@
             y: 0,
             w: line.w,
             h:200,
+            _move: function() {
+                this.y = mouse.y - this.h / 2
+            },
             draw: function() {
                 canvasCtx.fillStyle = "#FFF";
                 canvasCtx.fillRect(this.x, this.y, this.w, this.h)
                 //x = 10, y=raquete.y, L=espessura, A=alturaRaquete (fillRect(x,y,L,A))
+
+                this._move()
             },
         }
 
 
         //Desenha a raquete direita
-        const higthPaddle = {
+        const rigthPaddle = {
             x: field.w - line.w - gapX,
             y: 400,
             w: line.w,
             h:200,
+            _move: function() {
+                this.y = ball.y
+            },
             draw: function() {
                 canvasCtx.fillStyle = "#FFF";
                 canvasCtx.fillRect(this.x, this.y, this.w, this.h)
                 //x = 10, y=raquete.y, L=espessura, A=alturaRaquete (fillRect(x,y,L,A))
+
+                this._move()
             },
         }
 
@@ -80,15 +94,20 @@
             x: 300,
             y: 200,
             r:20,
+            speed: 3,
+            _move: function() { //Movimentar a bola
+                this.x += 1 * this.speed
+                this.y += 1
+            },
             draw: function() {
                 canvasCtx.fillStyle = "#FFF";
                 canvasCtx.beginPath()
                 canvasCtx.arc(this.x, this.y, this.r, 0, 2 * Math.PI, false)
                 canvasCtx.fill()
+
+                this._move()
             },
         }
-
-        
 
     //Função que define a altura e largura na página
         function setup() {
@@ -101,16 +120,38 @@
            field.draw()
            line.draw()
            leftPaddle.draw()
-           higthPaddle.draw()
+           rigthPaddle.draw()
            scoreboard.draw()
            ball.draw()
-           
-
         }
-            
 
-        setup();
-        draw();
+        //Velocidade do movimento da bola
+        window.animateFrame = (function () {
+            return (
+                window.requestAnimationFrame ||
+                window.webkitRequestAnimationFrame ||
+                window.mozRequestAnimationFrame ||
+                window.oRequestAnimationFrame ||
+                window.msRequestAnimationFrame ||
+                function (callback) {
+                    return window.setTimeout(callback, 1000 / 60)
+                }
+            )
+        })()
+
+        function main () {
+            animateFrame(main)
+            draw()
+        }
+
+        setup()
+        main()
+
+        //Movimento da raquete esquerda
+        canvasEl.addEventListener('mousemove', function(e) {
+            mouse.x = e.pageX
+            mouse.y = e.pageY
+        })
 
     </script>
 </body>
